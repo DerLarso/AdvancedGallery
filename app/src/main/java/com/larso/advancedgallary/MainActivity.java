@@ -89,42 +89,70 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addCategoryButton(String categoryName) {
-        Button newCategoryButton = new Button(this);
-        newCategoryButton.setText(categoryName);
-        Button newDeleteCategoryButton = new Button(this);
-        newDeleteCategoryButton.setText("\uD83D\uDDD1");
-        newCategoryButton.setOnClickListener(new View.OnClickListener() {
+        if(!categoryName.equals("\uD83D\uDDD1")){
+            Button newCategoryButton = new Button(this);
+            newCategoryButton.setText(categoryName);
+            newCategoryButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    GoToCategory(categoryName);
+                }
+            });
+            categoryButtonContainer.addView(newCategoryButton);
+            Button newDeleteCategoryButton = new Button(this);
+            newDeleteCategoryButton.setText("\uD83D\uDDD1");
+            newDeleteCategoryButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteCategory(categoryName);
+                }
+            });
+            categoryButtonContainer.addView(newDeleteCategoryButton);
+        }
+    }
+    private void deleteCategory(String categoryName){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Kategorie löschen?");
+        builder.setMessage("Bist du sicher, dass du die Kategorie " + categoryName + " löschen willst?");
+        builder.setPositiveButton("Ja!", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                GoToCategory(categoryName);
-            }
-        });
-        newDeleteCategoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Bist du sicher, dass du die Kategorie Löschen möchtest?");
-                builder.setPositiveButton("Ja!", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        categoryButtonContainer.removeView(newCategoryButton);
-                        categoryButtonContainer.removeView(newDeleteCategoryButton);
+            public void onClick(DialogInterface dialog, int which) {
+                Button categoryButtonToDelete = null;
+                Button deleteButtonToDelete = null;
+
+                for(int i = 0; i < categoryButtonContainer.getChildCount(); i++){
+                    View child = categoryButtonContainer.getChildAt(i);
+                    if(child instanceof Button && ((Button) child).getText().toString().equals(categoryName)){
+                        categoryButtonToDelete = (Button) child;
+
+                        if(i+1 < categoryButtonContainer.getChildCount()){
+                            View nextChild = categoryButtonContainer.getChildAt(i+1);
+                            if(nextChild instanceof Button && ((Button) nextChild).getText().toString().equals("\uD83D\uDDD1")){
+                                deleteButtonToDelete = (Button) nextChild;
+                            }
+                        }
+                        break;
                     }
-                });
-                builder.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which){
-                        dialog.cancel();
-                    }
-                });
+
+                }
+                if(categoryButtonToDelete != null){
+                    categoryButtonContainer.removeView(categoryButtonToDelete);
+                }
+                if(deleteButtonToDelete != null){
+                    categoryButtonContainer.removeView(deleteButtonToDelete);
+                }
+
                 saveCategories();
             }
         });
-
-        categoryButtonContainer.addView(newCategoryButton);
-        categoryButtonContainer.addView(newDeleteCategoryButton);
+        builder.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which){
+                dialog.cancel();
+            }
+        });
+        builder.show();
     }
-
     private void GoToCategory(String categoryName){
         Intent intent = new Intent(getApplicationContext(), ShowCategory.class);
         intent.putExtra("categoryName", categoryName);
