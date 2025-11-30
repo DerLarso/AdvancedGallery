@@ -1,4 +1,4 @@
-package com.larso.advancedgallary;
+package com.larso.advancedgallery;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,12 +20,14 @@ import android.content.SharedPreferences;
 import java.util.HashSet;
 import java.util.*;
 
-import com.larso.advancedgallary.activities.SettingsActivity;
-import com.larso.advancedgallary.activities.ShowCategory;
+import com.larso.advancedgallery.activities.SettingsActivity;
+import com.larso.advancedgallery.activities.ShowCategory;
 
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout categoryButtonContainer;
+
+    private LinearLayout deleteCategoryButtonContainer;
     private static final String PREFS_NAME = "MyAdvancedGallaryPrefs";
     private static final String SETTINGS_KEY = "settings";
     private static final String CATEGORIES_KEY = "categories";
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         categoryButtonContainer = findViewById(R.id.category_button_container);
-
+        deleteCategoryButtonContainer = findViewById(R.id.delete_category_button_container);
         loadCategories();
     }
 
@@ -107,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     deleteCategory(categoryName);
                 }
             });
-            categoryButtonContainer.addView(newDeleteCategoryButton);
+            deleteCategoryButtonContainer.addView(newDeleteCategoryButton);
         }
     }
     private void deleteCategory(String categoryName){
@@ -124,12 +126,9 @@ public class MainActivity extends AppCompatActivity {
                     View child = categoryButtonContainer.getChildAt(i);
                     if(child instanceof Button && ((Button) child).getText().toString().equals(categoryName)){
                         categoryButtonToDelete = (Button) child;
-
-                        if(i+1 < categoryButtonContainer.getChildCount()){
-                            View nextChild = categoryButtonContainer.getChildAt(i+1);
-                            if(nextChild instanceof Button && ((Button) nextChild).getText().toString().equals("\uD83D\uDDD1")){
-                                deleteButtonToDelete = (Button) nextChild;
-                            }
+                        View nextChild = deleteCategoryButtonContainer.getChildAt(i);
+                        if(nextChild instanceof Button && ((Button) nextChild).getText().toString().equals("\uD83D\uDDD1")){
+                            deleteButtonToDelete = (Button) nextChild;
                         }
                         break;
                     }
@@ -139,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                     categoryButtonContainer.removeView(categoryButtonToDelete);
                 }
                 if(deleteButtonToDelete != null){
-                    categoryButtonContainer.removeView(deleteButtonToDelete);
+                    deleteCategoryButtonContainer.removeView(deleteButtonToDelete);
                 }
 
                 saveCategories();
@@ -172,6 +171,12 @@ public class MainActivity extends AppCompatActivity {
         Set<String> categories = new HashSet<>();
         for (int i = 0; i < categoryButtonContainer.getChildCount(); i++) {
             View child = categoryButtonContainer.getChildAt(i);
+            if (child instanceof Button) {
+                categories.add(((Button) child).getText().toString());
+            }
+        }
+        for (int i = 0; i < deleteCategoryButtonContainer.getChildCount(); i++) {
+            View child = deleteCategoryButtonContainer.getChildAt(i);
             if (child instanceof Button) {
                 categories.add(((Button) child).getText().toString());
             }

@@ -1,4 +1,4 @@
-package com.larso.advancedgallary;
+package com.larso.advancedgallery;
 
 import android.content.Context;
 

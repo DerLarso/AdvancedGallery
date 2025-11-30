@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.larso.advancedgallary"
+    namespace = "com.larso.advancedgallery"
     compileSdk {
         version = release(36)
     }

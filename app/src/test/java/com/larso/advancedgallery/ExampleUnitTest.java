@@ -1,4 +1,4 @@
-package com.larso.advancedgallary;
+package com.larso.advancedgallery;
 
 import org.junit.Test;
 

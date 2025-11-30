@@ -1,4 +1,4 @@
-package com.larso.advancedgallary.activities;
+package com.larso.advancedgallery.activities;
 
 import android.os.Bundle;
 import android.view.View;
@@ -11,10 +11,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import android.content.SharedPreferences;
-import java.util.HashSet;
-import java.util.*;
 
-import com.larso.advancedgallary.R;
+import com.larso.advancedgallery.R;
 
 public class SettingsActivity extends AppCompatActivity {
 
