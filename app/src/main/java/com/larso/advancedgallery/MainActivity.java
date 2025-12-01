@@ -17,6 +17,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import android.content.SharedPreferences;
+
+import java.io.File;
 import java.util.HashSet;
 import java.util.*;
 
@@ -26,7 +28,6 @@ import com.larso.advancedgallery.activities.ShowCategory;
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout categoryButtonContainer;
-
     private LinearLayout deleteCategoryButtonContainer;
     private static final String PREFS_NAME = "MyAdvancedGallaryPrefs";
     private static final String SETTINGS_KEY = "settings";
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
     public void createNewCategory(View view) {
+        AlertDialog.Builder duplicateBuilder = new AlertDialog.Builder(this);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Neue Kategorie:");
 
@@ -73,10 +75,15 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("Fertig", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String categoryName = input.getText().toString();
-                if (!categoryName.isEmpty()) {
+                String categoryName = input.getText().toString().toUpperCase().trim();
+                boolean isDuplicate = isExistingCategory(categoryName);
+                if (!categoryName.isEmpty() && !isDuplicate) {
                     addCategoryButton(categoryName);
                     saveCategories();
+                } else {
+                    dialog.cancel();
+                    duplicateBuilder.setTitle("Diese Kategorie ist leer oder existiert bereits!");
+                    duplicateBuilder.show();
                 }
             }
         });
@@ -140,7 +147,8 @@ public class MainActivity extends AppCompatActivity {
                 if(deleteButtonToDelete != null){
                     deleteCategoryButtonContainer.removeView(deleteButtonToDelete);
                 }
-
+                deleteCategoryStorage(categoryName);
+                deleteCategorySharedPreferences(categoryName);
                 saveCategories();
             }
         });
@@ -152,6 +160,25 @@ public class MainActivity extends AppCompatActivity {
         });
         builder.show();
     }
+    private void deleteCategorySharedPreferences(String categoryName){
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(categoryName);
+        editor.apply();
+    }
+    private void deleteCategoryStorage(String categoryName){
+        File categoryDirection = new File(getFilesDir(), categoryName);
+
+        if(categoryDirection.exists() && categoryDirection.isDirectory()){
+            File[] files = categoryDirection.listFiles();
+            if(files != null){
+                for(File file : files){
+                    file.delete();
+                }
+            }
+        }
+        categoryDirection.delete();
+    }
     private void GoToCategory(String categoryName){
         Intent intent = new Intent(getApplicationContext(), ShowCategory.class);
         intent.putExtra("categoryName", categoryName);
@@ -160,10 +187,15 @@ public class MainActivity extends AppCompatActivity {
     private void loadCategories() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         Set<String> categories = prefs.getStringSet(CATEGORIES_KEY, new HashSet<>());
-        for (String categoryName : categories) {addCategoryButton(categoryName);
+        for (String categoryName : categories) {
+            addCategoryButton(categoryName);
         }
     }
-
+    public boolean isExistingCategory(String categoryName) {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        Set<String> categories = prefs.getStringSet(CATEGORIES_KEY, new HashSet<>());
+        return categories.contains(categoryName);
+    }
     private void saveCategories() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
