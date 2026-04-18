@@ -22,6 +22,7 @@
         </activity>
         <activity android:name=".activities.SettingsActivity" />
         <activity android:name=".activities.ShowCategory" />
+        <activity android:name=".activities.ShowImage"/>
     </application>
 
 </manifest>

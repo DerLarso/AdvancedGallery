@@ -3,12 +3,14 @@ package com.larso.advancedgallery.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.LinkAddress;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -106,17 +108,45 @@ public class ShowCategory extends AppCompatActivity {
         rowLayout.setGravity(Gravity.CENTER_VERTICAL);
         rowLayout.setTag(fileName);
 
-        ImageView imageView = new ImageView(this);
+        File imageFile = new File(new File(getFilesDir(), THIS_CATEGORY), fileName);
+
+        ImageButton imageButton = getViewButton(imageFile);
+
+        Button deleteButton = getDeleteButton(imageFile, rowLayout);
+        rowLayout.addView(imageButton);
+        rowLayout.addView(deleteButton);
+        imageTableContainer.addView(rowLayout);
+        saveItems();
+    }
+    private ImageButton getViewButton(File file){
+        ImageButton imageButton = new ImageButton(this);
         LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(300,300);
         imageParams.setMargins(10,10,10,10);
-        imageView.setLayoutParams(imageParams);
+        imageButton.setLayoutParams(imageParams);
+        imageButton.setBackgroundResource(0);
+        imageButton.setPadding(0,0,0,0);
 
-        File imageFile = new File(new File(getFilesDir(), THIS_CATEGORY), fileName);
-        if(imageFile.exists()){
-            imageView.setImageURI(Uri.fromFile(imageFile));
+        if(file.exists()){
+            imageButton.setImageURI(Uri.fromFile(file));
         }
 
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageButton.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToImageView(file);
+            }
+        });
+
+        return imageButton;
+    }
+    private void goToImageView(File file){
+        Intent intent = new Intent(getApplicationContext(), ShowImage.class);
+        intent.putExtra("file", file.getAbsolutePath());
+        startActivity(intent);
+    }
+    private Button getDeleteButton(File file,  LinearLayout rowLayout){
         Button deleteButton = new Button(this);
         deleteButton.setText("\uD83D\uDDD1");
 
@@ -126,7 +156,7 @@ public class ShowCategory extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ShowCategory.this);
                 builder.setTitle("Möchtest du das Bild wirklich löschen?");
                 builder.setPositiveButton("Ja!", (dialog, which) -> {
-                    imageFile.delete();
+                    file.delete();
                     imageTableContainer.removeView(rowLayout);
                     saveItems();
                     Toast.makeText(ShowCategory.this, "Bild gelöscht", Toast.LENGTH_SHORT).show();
@@ -137,11 +167,8 @@ public class ShowCategory extends AppCompatActivity {
                 builder.show();
 
             }
-            });
-        rowLayout.addView(imageView);
-        rowLayout.addView(deleteButton);
-        imageTableContainer.addView(rowLayout);
-        saveItems();
+        });
+        return deleteButton;
     }
     public void saveItems() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
