@@ -16,14 +16,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         >
-        <ImageView
+        <io.getstream.photoview.PhotoView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:id="@+id/imageView"
             android:scaleType="fitCenter"
             >
-        </ImageView>
+        </io.getstream.photoview.PhotoView>
     </LinearLayout>
     <Button
         android:layout_width="match_parent"

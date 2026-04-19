@@ -13,6 +13,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import io.getstream.photoview.PhotoView;
+
+
 import com.larso.advancedgallery.R;
 
 import java.io.File;
@@ -20,8 +23,7 @@ import java.io.File;
 public class ShowImage extends AppCompatActivity {
     private static final String PREFS_NAME = "MyAdvancedGallaryPrefs";
     private static final String SETTINGS_KEY = "settings";
-    private ImageView imageView;
-    private LinearLayout layout;
+    private PhotoView imageView;
     private String THIS_IMAGE;
 
     @Override
